@@ -22,7 +22,7 @@
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  /* ---------- Header sticky com estado ---------- */
+  /* ---------- Header sticky/fixed com estado ---------- */
   const header = document.querySelector('.site-header');
   const setHeaderHeight = () => {
     if (header) {
@@ -64,7 +64,11 @@
   };
 
   if (toggle && nav) {
-    toggle.addEventListener('click', () => {
+    toggle.addEventListener('click', (e) => {
+      // Impede o salto da página e garante que o clique não dispare âncoras por acidente
+      e.preventDefault();
+      e.stopPropagation();
+
       const isOpen = toggle.getAttribute('aria-expanded') === 'true';
       isOpen ? closeMenu() : openMenu();
     });
@@ -157,8 +161,12 @@
   /* ---------- Fechamento suave do menu ao clicar em âncoras ---------- */
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener('click', (e) => {
+      // Previne que a lógica de âncora afete o botão do menu hamburger
+      if (anchor.closest('.menu-toggle')) return;
+
       const targetId = anchor.getAttribute('href');
       if (targetId.length <= 1) return;
+
       const target = document.querySelector(targetId);
       if (!target) return;
 

@@ -27,6 +27,8 @@ body {
   color: #1a2419;
   background: #fbf7ee;
   -webkit-font-smoothing: antialiased;
+
+  /* Retornado para hidden de forma segura, pois o header agora será fixed */
   overflow-x: hidden;
 }
 
@@ -224,9 +226,11 @@ p {
    HEADER
    ========================================================= */
 .site-header {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 100;
+  left: 0;
+  width: 100%;
+  z-index: 999;
   padding: 0.85rem 0;
   background: transparent;
   transition:
@@ -254,6 +258,8 @@ p {
   gap: 0.7rem;
   color: #fbf7ee;
   transition: color 0.25s ease;
+  position: relative;
+  z-index: 1002;
 }
 .site-header.is-scrolled .brand {
   color: #1e3a2b;
@@ -325,7 +331,7 @@ p {
   color: #fbf7ee;
 }
 
-/* Menu mobile */
+/* Menu mobile (Botão Toggle) */
 .menu-toggle {
   display: none;
   flex-direction: column;
@@ -335,6 +341,8 @@ p {
   height: 42px;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.14);
+  position: relative;
+  z-index: 9999;
 }
 .menu-toggle span {
   display: block;
@@ -344,7 +352,8 @@ p {
   margin: 0 auto;
   transition:
     transform 0.25s ease,
-    opacity 0.2s ease;
+    opacity 0.2s ease,
+    background-color 0.25s ease;
 }
 .site-header.is-scrolled .menu-toggle {
   background: rgba(30, 58, 43, 0.08);
@@ -353,6 +362,12 @@ p {
   background: #1e3a2b;
 }
 
+.menu-toggle[aria-expanded='true'] {
+  background: rgba(255, 255, 255, 0.14) !important;
+}
+.menu-toggle[aria-expanded='true'] span {
+  background: #fbf7ee !important;
+}
 .menu-toggle[aria-expanded='true'] span:nth-child(1) {
   transform: translateY(7px) rotate(45deg);
 }
@@ -369,7 +384,6 @@ p {
 .hero {
   position: relative;
   min-height: clamp(540px, 92vh, 820px);
-  margin-top: calc(-1 * (var(--header-h, 72px) + 1rem));
   display: flex;
   align-items: center;
   color: #fbf7ee;
@@ -721,7 +735,6 @@ p {
 .cta-band {
   position: relative;
   background:
-    /* Mantemos um gradiente escuro para garantir que o texto branco continua legível sobre a foto aérea */
     linear-gradient(120deg, rgba(15, 30, 22, 0.75), rgba(30, 58, 43, 0.8)),
     url('assets/cta-final.webp') center / cover no-repeat;
   color: #fbf7ee;
@@ -999,49 +1012,81 @@ p {
    MENU MOBILE
    ========================================================= */
 @media (max-width: 900px) {
+  /* Bloqueia o scroll na tag HTML caso o menu esteja aberto */
+  html:has(body.menu-open) {
+    overflow: hidden;
+  }
+
   .menu-toggle {
     display: flex;
+    z-index: 9999;
   }
 
   .primary-nav {
     position: fixed;
-    inset: 0;
     top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
     background: #1e3a2b;
-    padding: 6rem 1.6rem 2rem;
+    padding: 7.5rem 1.6rem 2rem;
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
     gap: 1.2rem;
     transform: translateX(100%);
     transition: transform 0.3s ease;
-    z-index: 99;
+    z-index: 9998;
     overflow-y: auto;
   }
+
   .primary-nav.is-open {
     transform: translateX(0);
+
+    /* Garante que apenas o menu faz scroll internamente */
+    touch-action: auto;
+
+    /* Impede que a ação de arrastar o menu "vaze" para a página por trás */
+    overscroll-behavior: contain;
   }
+
   .primary-nav ul {
     flex-direction: column;
     align-items: stretch;
     gap: 0.3rem;
   }
+
   .primary-nav a {
     display: block;
     padding: 0.9rem 0.5rem;
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     font-family: 'Lora', serif;
-    color: #fbf7ee;
+    color: #fbf7ee !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
+
   .site-header.is-scrolled .primary-nav a {
-    color: #fbf7ee;
-  }
-  .header-cta {
-    align-self: flex-start;
-    margin-top: 0.8rem;
+    color: #fbf7ee !important;
   }
 
+  .site-header.is-scrolled .primary-nav .btn-primary {
+    color: #1e3a2b !important;
+  }
+
+  .primary-nav .btn-primary {
+    align-self: flex-start;
+    margin-top: 1.5rem;
+    background-color: #fbf7ee !important;
+    color: #1e3a2b !important;
+    border: none;
+    padding: 0.9rem 1.8rem;
+    font-family: 'Inter', sans-serif;
+    border-radius: 999px;
+  }
+
+  /* REMOVIDO height: 100vh e touch-action: none AQUI */
   body.menu-open {
     overflow: hidden;
   }
@@ -1081,4 +1126,28 @@ p {
   .site-logo {
     height: 45px;
   }
+}
+
+/* =========================================================
+   ÍCONES SOCIAIS DO RODAPÉ
+   ========================================================= */
+.footer-social {
+  display: flex;
+  gap: 1.2rem;
+  margin-top: 1.2rem;
+}
+
+.footer-social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #e7e2d2;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+.footer-social a:hover {
+  color: #ffffff;
+  transform: translateY(-2px);
 }
